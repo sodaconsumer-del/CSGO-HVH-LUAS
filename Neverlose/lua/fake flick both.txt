@@ -1,0 +1,149 @@
+-- Referências definidas conforme a API
+local refs = {
+    enableaanl       = ui.find("Aimbot", "Anti Aim", "Angles", "Enabled"),
+    disable          = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw"),
+    pitch            = ui.find("Aimbot", "Anti Aim", "Angles", "Pitch"),
+    yaw              = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw"),
+    base             = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw", "Base"),
+    yawoffset        = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw", "Offset"),
+    backstab         = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw", "Avoid Backstab"),
+    hidden           = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw", "Hidden"),
+    modifier         = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw Modifier"),
+    modoffset        = ui.find("Aimbot", "Anti Aim", "Angles", "Yaw Modifier", "Offset"),
+    bodyyaw          = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw"),
+    inverter         = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw", "Inverter"),
+    leftlimit        = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw", "Left Limit"),
+    rightlimit       = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw", "Right Limit"),
+    options          = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw", "Options"),
+    bodyyawfs        = ui.find("Aimbot", "Anti Aim", "Angles", "Body Yaw", "Freestanding"),
+    extended         = ui.find("Aimbot", "Anti Aim", "Angles", "Extended Angles"),
+    extendedpitch    = ui.find("Aimbot", "Anti Aim", "Angles", "Extended Angles", "Extended Pitch"),
+    extendedroll     = ui.find("Aimbot", "Anti Aim", "Angles", "Extended Angles", "Extended Roll"),
+    fs               = ui.find("Aimbot", "Anti Aim", "Angles", "Freestanding"),
+    fss              = ui.find("Aimbot", "Anti Aim", "Angles", "Freestanding", "Disable Yaw Modifiers"),
+    fsb              = ui.find("Aimbot", "Anti Aim", "Angles", "Freestanding", "Body Freestanding"),
+    fakeduck         = ui.find("Aimbot", "Anti Aim", "Misc", "Fake Duck"),
+    sw               = ui.find("Aimbot", "Anti Aim", "Misc", "Slow Walk"),
+    leg              = ui.find("Aimbot", "Anti Aim", "Misc", "Leg Movement"),
+    pa               = ui.find("Aimbot", "Ragebot", "Main", "Peek Assist"),
+    dt               = ui.find("Aimbot", "Ragebot", "Main", "Double Tap"),
+    hs               = ui.find("Aimbot", "Ragebot", "Main", "Hide Shots"),
+    hslag            = ui.find("Aimbot", "Ragebot", "Main", "Hide Shots", "Options"),
+    dtlag            = ui.find("Aimbot", "Ragebot", "Main", "Double Tap", "Lag Options"),
+    scope            = ui.find("Visuals", "World", "Main", "Override Zoom", "Scope Overlay"),
+    fov              = ui.find("Visuals", "World", "Main", "Field of View"),
+    weaponact        = ui.find("Miscellaneous", "Main", "Other", "Weapon Actions"),
+    spike            = ui.find("Miscellaneous", "Main", "Other", "Fake Latency"),
+    bodyaim          = ui.find("Aimbot", "Ragebot", "Safety", "Body Aim"),
+    dormant          = ui.find("Aimbot", "Ragebot", "Main", "Enabled", "Dormant Aimbot"),
+    min_damage_ui    = ui.find("Aimbot", "Ragebot", "Selection", "Min. Damage"),
+    dmg              = ui.find("Aimbot", "Ragebot", "Selection", "Min. Damage"),
+    clantag          = ui.find("Miscellaneous", "Main", "In-Game", "Clan Tag"),
+    ragebot_find     = ui.find("Aimbot", "Ragebot", "Main"),
+    hc_find          = ui.find("Aimbot", "Ragebot", "Selection", "Hit Chance")
+}
+
+-- Obtém os switches da UI
+local confirm_switch    = ui.find("Aimbot", "Anti Aim", "Angles"):switch("confirm")
+local fakeflick_switch  = ui.find("Aimbot", "Anti Aim", "Angles"):switch("Fake Flick")
+
+-- Função que executa o fake flick
+local function execute_fakeflick(cmd)
+    -- Se a exploit não estiver ativa, não faz nada.
+    if rage.exploit:get() < 1 then
+        return
+    end
+
+    -- Se o switch Fake Flick estiver ativo, aplica os overrides.
+    if fakeflick_switch:get() then
+        rage.antiaim:inverter(false)
+        if refs.yawoffset then refs.yawoffset:override(math.random(11)) end
+        if refs.modifier then refs.modifier:override("Center") end 
+		if refs.modifier then refs.modoffset:override(math.random(7, 13)) end
+        if refs.bodyyaw then refs.bodyyaw:override(true) end
+        if refs.options then refs.options:override("") end
+        if refs.leftlimit then refs.leftlimit:override(math.random(58)) end
+        if refs.rightlimit then refs.rightlimit:override(math.random(35)) end
+        if refs.fs then refs.fs:override(false) end
+        if refs.hidden then refs.hidden:override(true) end
+		
+				
+		local rand2 = math.random(1, 4)
+		if rand2 == 1 then
+		    rage.antiaim:override_hidden_pitch(10)
+		elseif rand2 == 2 then
+		    rage.antiaim:override_hidden_pitch(-10)
+		elseif rand2 == 3 then
+		    rage.antiaim:override_hidden_pitch(5)
+		elseif rand2 == 4 then
+		    rage.antiaim:override_hidden_pitch(-5)
+		end
+
+        
+		
+		
+		local rand = math.random(1,4)
+		if rand == 1 then 
+			toggle_yaw_offset = -70 
+		elseif rand == 2 then
+		   toggle_yaw_offset = 80 
+		elseif rand == 3 then
+		    toggle_yaw_offset = -75
+		elseif rand == 4 then
+		    toggle_yaw_offset = 90
+		end
+		
+	
+		
+		
+		
+        rage.antiaim:override_hidden_yaw_offset(toggle_yaw_offset)
+
+        if refs.hslag then refs.hslag:override("Break LC") end
+        if refs.dtlag then refs.dtlag:override("Always On") end
+		
+		local rand3= math.random(1,4)
+		if rand3 == 1 then 
+			f_def = 7 
+		elseif rand3 == 2 then
+		   f_def = 4
+		elseif rand3 == 3 then
+		    f_def = 6
+		elseif rand3 == 4 then
+		    f_def = 3
+		end
+        cmd.force_defensive = (cmd.command_number % f_def == 0)
+    else
+        -- Se o switch Fake Flick for desativado, reinicia o Anti-Aim
+        -- Aqui desligamos e ligamos a opção Hidden para reiniciar o Anti-Aim
+        if refs.hidden then
+			refs.hidden:override(true)   
+            refs.hidden:override(false)  -- Desativa o Hidden
+      -- Ativa o Hidden novamente
+        end
+
+        -- Desativa bodyyaw e freestanding
+		-- Reativa o Body Yaw
+        if refs.fs then refs.fs:override(true) end -- Reativa o Freestanding
+		
+		if refs.modifier then refs.modifier:override(nil) end
+        
+		if refs.fs then refs.fs:override(false) end -- Reativa o Freestanding
+		if refs.bodyyaw then refs.bodyyaw:override(true) end
+		
+
+        -- Reverte outros overrides para os valores originais
+        if refs.yawoffset then refs.yawoffset:override(nil) end
+        if refs.modifier then refs.modifier:override("Enabled") end
+        if refs.options then refs.options:override("Default") end
+        if refs.leftlimit then refs.leftlimit:override(math.random(45, 55)) end
+        if refs.rightlimit then refs.rightlimit:override(math.random(45, 60)) end
+    end
+end
+
+-- Registra o evento createmove, verificando o estado do switch confirm a cada tick
+events.createmove:set(function(cmd)
+    if confirm_switch and confirm_switch:get() then
+        execute_fakeflick(cmd)
+    end
+end)

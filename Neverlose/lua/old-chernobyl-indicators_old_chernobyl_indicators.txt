@@ -1,0 +1,145 @@
+local gradient = require("neverlose/gradient")
+ui.sidebar(gradient.text("chern indicators", "]", { color(250, 0, 0), color(255, 157, 0)}), "biohazard")
+
+ffi.cdef[[
+    
+    int VirtualProtect(void* lpAddress, unsigned long dwSize, unsigned long flNewProtect, unsigned long* lpflOldProtect);
+    void* VirtualAlloc(void* lpAddress, unsigned long dwSize, unsigned long  flAllocationType, unsigned long flProtect);
+    int VirtualFree(void* lpAddress, unsigned long dwSize, unsigned long dwFreeType);
+    typedef uintptr_t (__thiscall* GetClientEntity_4242425_t)(void*, int);
+
+    void* __stdcall URLDownloadToFileA(void* LPUNKNOWN, const char* LPCSTR, const char* LPCSTR2, int a, int LPBINDSTATUSCALLBACK);
+    bool DeleteUrlCacheEntryA(const char* lpszUrlName);
+
+]]
+
+local urlmon = ffi.load 'UrlMon'
+local wininet = ffi.load 'WinInet'
+
+
+
+
+local Download = function(from, to)
+    wininet.DeleteUrlCacheEntryA(from)
+    urlmon.URLDownloadToFileA(nil, from, to, 0,0)
+end
+
+files.create_folder('nl\\chernobylindicators')
+    Download("https://cdn.discordapp.com/attachments/839906710507880541/1019654524169900163/pixel.ttf", "nl\\chernobylindicators\\Smallest Pixel-7.ttf")
+    Download("https://cdn.discordapp.com/attachments/689186327886954619/1043930890625097758/DEJAVUSANS-BOLD.TTF", 'nl\\chernobylindicators\\DejaVu Sans.ttf')
+
+
+
+
+
+
+
+
+
+
+
+local ref = ui.create("indicators", " indicators")
+local enable = ref:switch("Enable Chernobyl Indicators")
+local fnt = render.load_font('nl\\chernobylindicators\\Smallest Pixel-7.ttf', 10, "o")
+local foont = render.load_font('nl\\chernobylindicators\\DejaVu Sans.ttf', 10, "odu")
+info_panel_ref = enable:create()
+local clr1 =  ref:color_picker("color", color(40, 185, 255, 230))
+local clr2 =  color(255, 255, 255, 255)
+local gradient_animation = gradient.text_animate("", -3, {
+    color(66, 203, 245), 
+    color(119, 56, 255)
+})
+local ax = 0
+local keybinds = {
+    ["DT"] = ui.find("Aimbot", "Ragebot", "Main", "Double Tap"),
+    ["AP"] = ui.find("Aimbot", "Ragebot", "Main", "Peek Assist"),
+    ["FD"] = ui.find("Aimbot","Anti Aim","Misc","Fake Duck"),
+    ["HS"] = ui.find("Aimbot", "Ragebot", "Main", "Hide Shots"),
+}
+local mein
+
+local lerp = function(a, b, percent)
+    return a - (a - b) * percent
+end
+  
+local move = 0;
+local scnd
+function get_bodyaw()
+    local player = entity.get_local_player()
+    if player == nil then return end
+	local pose = player.m_flPoseParameter[11]
+
+	return math.floor(math.min(60, (pose * 120 - 60)))
+end
+events.render:set(get_bodyaw)
+local function menuxd()
+    if enable:get() then
+    else
+    end
+end
+events.render:set(menuxd)
+events.render:set(function()
+    local animtime = 0.03
+    
+    local yaww = get_bodyaw()
+    if not enable:get() then return end
+    local lp = entity.get_local_player()
+    if not globals.is_in_game then return end
+    local is_scoped = lp.m_bIsScoped
+    if yaww > 0 then
+        mein = clr1
+        scnd = clr2
+    elseif yaww < 0 then
+        mein = clr2
+        scnd = clr1
+    end
+    local scrsz = render.screen_size()
+    local txtsz2 = render.measure_text(fnt, "c", ("aerq"))
+    local txtsz3 = render.measure_text(fnt, "c", ("tehf"))
+    local txtsz = render.measure_text(fnt, "c", ("aerq"), ("tehf"))
+    local txtstt
+    if lp.m_fFlags == 263 then
+        txtstt = "-crouch-"
+    elseif lp.m_vecVelocity:length2d() < 5 then
+        txtstt = "-standing-"
+    elseif lp.m_fFlags == 256 then
+        txtstt = "-inair-"
+    elseif lp.m_fFlags == 262 then
+        txtstt = "-c-air-"
+    elseif lp.m_vecVelocity:length2d() <= 110 then
+        txtstt = "-slowwalk-"
+    elseif lp.m_vecVelocity:length2d() > 110 then
+        txtstt = " -moving-"
+    end
+    local txtsz4 = render.measure_text(foont, "c",txtstt)
+    local txtsz5 = render.measure_text(fnt, "c","DT")
+    if is_scoped then
+        ax = 2
+        a = 0
+        b = 0
+        n = 0
+    else
+        ax = 0
+        n = 2
+        a = 0
+        b = 0
+    end
+    local prsnt = (lp.m_vecVelocity:length2d()/320)
+    if prsnt > 1 then prsnt = 1 end
+    for i = 0, 1 do
+        move = lerp(move, ax*i, animtime) 
+    end
+        local offset = render.measure_text(fnt, "c","DT").y + 4
+        local offset2 = render.measure_text(fnt, "c","DT").y + 4
+        for i, v in pairs(keybinds) do
+            local dap = v
+            if dap:get() then
+                a = a + 1.11
+             render.text(fnt, vector(scrsz.x/2-txtsz5.x/2+txtsz5.x/2*move+1+5*move,scrsz.y/2-txtsz3.y/2+18+1+a*offset2/2+-5+11), color(130, 210, 15, 255),"", i)
+            end
+        end
+        
+    render.text(fnt, vector(scrsz.x/2-txtsz4.x/2+move*txtsz4.x/2+1+5*move,scrsz.y/2-txtsz2.y/2+txtsz.y/1.5+5+11), color(255, 255, 255, 255), "с",  txtstt)
+    render.text(fnt, vector(scrsz.x/2-txtsz.x/2+txtsz.x/2*move+1+5*move,scrsz.y/2-txtsz2.y/7+11), clr1:get(),"", "chernobyl")
+    gradient_animation:animate()
+end)

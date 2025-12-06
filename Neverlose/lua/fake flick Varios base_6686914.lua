@@ -1,0 +1,405 @@
+-- 1) Referências centralizadas aos controles originais
+local refs = {
+    yawoffset  = ui.find("Aimbot","Anti Aim","Angles","Yaw","Offset"),
+    modifier   = ui.find("Aimbot","Anti Aim","Angles","Yaw Modifier"),
+    modoffset  = ui.find("Aimbot","Anti Aim","Angles","Yaw Modifier","Offset"),
+    bodyyaw    = ui.find("Aimbot","Anti Aim","Angles","Body Yaw"),
+    options    = ui.find("Aimbot","Anti Aim","Angles","Body Yaw","Options"),
+    leftlimit  = ui.find("Aimbot","Anti Aim","Angles","Body Yaw","Left Limit"),
+    rightlimit = ui.find("Aimbot","Anti Aim","Angles","Body Yaw","Right Limit"),
+    fs         = ui.find("Aimbot","Anti Aim","Angles","Freestanding"),
+    hidden     = ui.find("Aimbot","Anti Aim","Angles","Yaw","Hidden"),
+    hslag      = ui.find("Aimbot","Ragebot","Main","Hide Shots","Options"),
+    dtlag      = ui.find("Aimbot","Ragebot","Main","Double Tap","Lag Options"),
+}
+
+-- 2) Cria grupo, switch e combo para Fake Flick
+local group      = ui.create("Exploit","Anti Aim","Angles")
+local switch_ref = group:switch("Fake Flick")
+local combo_ref  = group:combo("Fake Flick Mode","Off","Default0","invert_Defaut0","invertUP","Default1","Default2","Stealth","Unpredictable","Sides","Angel","Air","W")
+--local slowwalk_ref = group:slider("Slow Walk Speed", 0, 100, 50)  -- 2ºi
+
+-- 3) Estado de armazenamento
+local storing     = false
+local stored_vals = {}
+
+-- 4) Captura estado atual
+local function store_current()
+    stored_vals = {
+        yawoffset  = refs.yawoffset:get(),
+        modifier   = refs.modifier:get(),
+        modoffset  = refs.modoffset:get(),
+        bodyyaw    = refs.bodyyaw:get(),
+        options    = refs.options:get(),
+        leftlimit  = refs.leftlimit:get(),
+        rightlimit = refs.rightlimit:get(),
+        fs         = refs.fs:get(),
+        hidden     = refs.hidden:get(),
+        hslag      = refs.hslag:get(),
+        dtlag      = refs.dtlag:get(),
+    }
+    storing = true
+end
+
+-- 5) Restaura estado armazenado
+local function restore_stored()
+    if not storing then return end
+    refs.yawoffset:override(stored_vals.yawoffset)
+    refs.modifier:override(stored_vals.modifier)
+    refs.modoffset:override(stored_vals.modoffset)
+    refs.bodyyaw:override(stored_vals.bodyyaw)
+    refs.options:override(stored_vals.options)
+    refs.leftlimit:override(stored_vals.leftlimit)
+    refs.rightlimit:override(stored_vals.rightlimit)
+    refs.fs:override()
+    refs.hidden:override(stored_vals.hidden)
+    refs.hslag:override(stored_vals.hslag)
+    refs.dtlag:override(stored_vals.dtlag)
+    storing = false
+end
+
+
+--funções
+local last_tick_print = 0
+local ticks_interval  = 64 * 2
+--funções
+
+
+-- 6) Presets com parâmetros para force_defensive
+local modes = {
+	Default0 = {
+        apply = function()
+            rage.antiaim:inverter(false)
+
+            refs.yawoffset:override(5)
+            refs.modifier:override("Random")
+            refs.modoffset:override(5)
+            refs.bodyyaw:override(true)
+            refs.options:override("")
+            refs.leftlimit:override(42)
+            refs.rightlimit:override(42)
+            refs.fs:override(false)
+
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(89)
+            rage.antiaim:override_hidden_yaw_offset(-70 or 90)
+            rage.antiaim:override_hidden_yaw_offset(-90 or 70)
+
+            refs.hslag:override("Break LC" or nil)
+            refs.dtlag:override("Always On" or nil)
+        end,
+        rnd_min = 7,
+        rnd_max = 7,
+    },
+	invert_Defaut0 = {
+        apply = function()
+            rage.antiaim:inverter(false)
+
+            refs.yawoffset:override(4)
+            refs.modifier:override("Random")
+            refs.modoffset:override(0)
+            refs.bodyyaw:override(true)
+            refs.options:override("")
+            refs.leftlimit:override()
+            refs.rightlimit:override()
+            refs.fs:override(false)
+
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(69)
+            rage.antiaim:override_hidden_yaw_offset(47)
+
+            refs.hslag:override("Break LC" or nil)
+            refs.dtlag:override("Always On" or nil)
+        end,
+        rnd_min = 4,
+        rnd_max = 5,
+    },
+	invertZERO = {
+        apply = function()
+            rage.antiaim:inverter(false)
+
+            refs.yawoffset:override(5)
+            refs.modifier:override("Random")
+            refs.modoffset:override(5)
+            refs.bodyyaw:override(true)
+            refs.options:override("")
+            refs.leftlimit:override(52)
+            refs.rightlimit:override(52)
+            refs.fs:override(false)
+
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(1)
+            rage.antiaim:override_hidden_yaw_offset(79)
+
+            refs.hslag:override("Break LC" or nil)
+            refs.dtlag:override("Always On" or nil)
+        end,
+        rnd_min = 4,
+        rnd_max = 5,
+    },
+	Default2 = {
+        apply = function()
+            refs.yawoffset:override(math.random(5,15))
+            refs.modifier:override("Random")
+            refs.modoffset:override(math.random(-1,5))
+            refs.bodyyaw:override(true)
+            refs.options:override("")
+            refs.leftlimit:override(math.random(11,62))
+            refs.rightlimit:override(math.random(11,62))
+            refs.fs:override(false)
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(math.random(-31,-55))
+            rage.antiaim:override_hidden_yaw_offset(math.random(-61,-85))
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 5,
+        rnd_max = 8,
+    },
+    Default1 = {
+        apply = function()
+            refs.yawoffset:override(5)
+            refs.modifier:override("Random")
+            refs.modoffset:override(0)
+            refs.bodyyaw:override(true)
+            refs.options:override("")
+            refs.leftlimit:override(math.random(41,62))
+            refs.rightlimit:override(math.random(41,62))
+            refs.fs:override(false)
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(math.random(-31,-55))
+            rage.antiaim:override_hidden_yaw_offset(math.random(-71,-75))
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 5,
+        rnd_max = 6,
+    },
+    Stealth = {
+        apply = function()
+            refs.yawoffset:override(math.random(-3,3))
+            refs.modifier:override("Center")
+            refs.modoffset:override(0)
+            refs.bodyyaw:override(true)
+			refs.leftlimit:override(math.random(11,22))
+            refs.rightlimit:override(math.random(11,22))
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(-math.random(25,50))
+            rage.antiaim:override_hidden_yaw_offset(math.random(-30,30))
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 7,
+        rnd_max = 8,
+    },
+    Unpredictable = {
+        apply = function()
+            refs.yawoffset:override(math.random(-8,8))
+            refs.modifier:override("Spin")
+            refs.modoffset:override(math.random(-30,30))
+            refs.bodyyaw:override(true)
+            refs.options:override("Jitter")
+            refs.leftlimit:override(math.random(10,60))
+            refs.rightlimit:override(math.random(10,60))
+            refs.fs:override(math.random()>0.5)
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(math.random(-89,89))
+            rage.antiaim:override_hidden_yaw_offset(math.random(-180,180))
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 2,
+        rnd_max = 3,
+    },
+    Sides = {
+        apply = function()
+            refs.yawoffset:override(math.random(-8,8))
+            refs.modifier:override("Spin")
+            refs.modoffset:override(math.random(-30,30))
+            refs.bodyyaw:override(true)
+            refs.options:override("Jitter")
+            refs.leftlimit:override(math.random(10,60))
+            refs.rightlimit:override(math.random(10,60))
+            refs.fs:override(math.random()>0.5)
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(0)
+            local h_yaw_values = {81, -75}
+            local h_yaw = h_yaw_values[ math.random(#h_yaw_values) ]
+            rage.antiaim:override_hidden_yaw_offset(h_yaw)
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 5,
+        rnd_max = 7,
+    },
+	Angel = {
+        apply = function()
+            refs.yawoffset:override(-5)
+            refs.modifier:override("Spin")
+            refs.modoffset:override(-12)
+            refs.bodyyaw:override(true)
+            refs.options:override("")
+            refs.leftlimit:override(math.random(15,35))
+            refs.rightlimit:override(math.random(15,35))
+            refs.hidden:override(true)
+            rage.antiaim:override_hidden_pitch(-35)
+            local h_yaw = math.random(-212,-245)
+            rage.antiaim:override_hidden_yaw_offset(h_yaw)
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 5,
+        rnd_max = 6,
+    },
+	Air = {
+        apply = function()
+            refs.yawoffset:override(math.random(-3,3))
+            refs.modifier:override("Center")
+            refs.modoffset:override(3)
+            refs.bodyyaw:override(true)
+			refs.options:override("")
+			local desync
+			local selector = math.random(0,5)
+			if selector < 3 then
+ 				desync = 0
+			else 
+				desync = 55
+			end
+            refs.leftlimit:override(desync)
+            refs.rightlimit:override(desync)
+            refs.hidden:override(true)
+			
+	
+            refs.hslag:override("Break LC")
+            refs.dtlag:override("Always On")
+        end,
+        rnd_min = 2,
+        rnd_max = 5,
+    },
+	W = {
+	    apply = function(cmd)
+	        -- 1. Overrides originais
+	        refs.yawoffset:override(math.random(-1, 6))
+	        refs.modifier:override("Center")
+	        refs.modoffset:override(-41)
+	        refs.bodyyaw:override(true)
+	        refs.options:override("")
+			refs.fs:override(false)
+	        -- 2. Lógica de desync
+	        local selector = math.random(0, 5)
+	        local desync   = math.random(11, 12)
+	        refs.leftlimit:override(desync*math.random(3, 5))
+	        refs.rightlimit:override(desync*math.random(3, 5))
+	
+	        -- 3. Pitch e Yaw hidden
+	        refs.hidden:override(true)
+	        
+	
+	        -- 4. Cálculo seguro de x (yaw offset)
+	        local x = 0
+	        if selector == 1 then
+	            x = -75 y = -math.random(5, 53)
+	        elseif selector == 2 then
+	            x = 175 y = -45
+	        elseif selector == 3 then
+	            x = 85  y = -math.random(-15, 13)
+	        elseif selector == 4 then
+	            x = 150 y = -math.random(-55, 53)
+	        elseif selector == 5 then
+	            x = -175 y = -45
+	        end
+	        rage.antiaim:override_hidden_yaw_offset(x)
+			rage.antiaim:override_hidden_pitch(y)
+	
+	        -- 5. Outros overrides
+	        refs.hslag:override("Break LC")
+	        refs.dtlag:override("Always On")
+	    end,
+	
+	    rnd_min = 3,
+        rnd_max = 5,
+	},
+}
+-- Cria o grupo e o slider customizado
+local group = ui.create("walk_speed", "Slowwalk")
+local slowwalk_slider = group:slider("Slowwalk Speed", 1, 100, 10, 1)
+
+-- Encontra o slider interno do cheat (ajuste o caminho se necessário)
+local slowwalk_ref = ui.find("Aimbot", "Anti Aim", "Misc", "Slow Walk")
+
+-- Função que aplica o slowwalk segundo o valor do slider
+local function set_slowwalk_speed(cmd)
+    local player = entity.get_local_player()
+    local slowwalk_speed = slowwalk_slider:get()
+
+    -- ignora se não estiver andando
+    if cmd.forwardmove == 0 and cmd.sidemove == 0 then
+        return
+    end
+
+    -- calcula o ângulo de movimento atual
+    local angle = math.atan2(cmd.sidemove, cmd.forwardmove)
+
+    -- aplica a velocidade desejada respeitando a direção
+    cmd.forwardmove = math.cos(angle) * slowwalk_speed
+    cmd.sidemove   = math.sin(angle) * slowwalk_speed
+end
+
+-- Verifica se o jogador está vivo
+local function is_local_player_alive()
+    local player = entity.get_local_player()
+    return player and player.m_iHealth > 0
+end
+
+-- Hook em createmove: só roda slowwalk se a opção interna estiver ON
+events.createmove:set(function(cmd)
+    if not is_local_player_alive() then
+        return
+    end
+
+    -- checa estado do slowwalk interno
+    if not slowwalk_ref or not slowwalk_ref:get() then
+        return
+    end
+
+    -- aplica o slowwalk customizado
+    set_slowwalk_speed(cmd)
+end)
+
+
+
+-- 7) Lógica principal de CreateMovelocal current_slowwalk = 0
+local function apply_fakeflick(cmd)
+    local on   = switch_ref:get()
+    local mode = combo_ref:get()
+	
+	
+
+    -- Ao ativar (On e modo != Off) e ainda sem armazenar, guarda
+    if on and mode ~= "Off" and not storing then
+        store_current()
+    end
+
+    -- Ao desativar ou escolher Off, restaura apenas uma vez
+    if storing and (not on or mode == "Off") then
+        restore_stored()
+        return
+    end
+
+    -- Se estivermos em Off sem nada armazenado, sai livremente
+    if not on or mode == "Off" then
+        return
+    end
+
+    -- Em modo válido: aplica preset e force_defensive específico
+    local m = modes[mode]
+    if m then
+        m.apply()
+        local n = math.random(m.rnd_min, m.rnd_max)
+        cmd.force_defensive = (cmd.command_number % n == 0)
+    end
+
+end
+
+-- 8) Registro do CreateMove
+events.createmove:set(apply_fakeflick)

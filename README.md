@@ -4,8 +4,11 @@ All luas are used at your own risk, especially obfuscated luas.
 
 fork of https://github.com/ogclub02/OGCLUB-LEAKS
 
-Credits to https://discord.gg/rollmopss (rollmops) 
-https://discord.gg/DGVfa2KXKv (scriptleaks)
+Credits
+https://discord.gg/HhxEYwMSaT (scriptleaks)
+https://discord.gg/su6JJGT3pZ (cracko)
+https://discord.gg/TZa8zCBjuv (codebreakers)
+
 
 Please star this repository if it helped you!
 
